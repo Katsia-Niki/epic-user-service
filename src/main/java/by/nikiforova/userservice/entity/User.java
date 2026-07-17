@@ -1,16 +1,11 @@
 package by.nikiforova.userservice.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -37,7 +32,8 @@ public class User extends BaseEntity {
     @Column(name = "active")
     private Boolean active;
 
-    @OneToMany(mappedBy = "user")
-    private List<PaymentCard> paymentCards;
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PaymentCard> paymentCards = new ArrayList<>();
 
 }
