@@ -20,8 +20,9 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: number
-                  type: VARCHAR(19)
+                  type: VARCHAR(16)
                   constraints:
+                    unique: true
                     nullable: false
               - column:
                   name: holder
