@@ -18,7 +18,7 @@ public interface PaymentCardRepository extends JpaRepository<PaymentCard, Long>,
     boolean existsByNumber(String number);
 
     @Query(value = "SELECT * FROM payment_cards WHERE user_id = :userId", nativeQuery = true)
-    List<PaymentCard> findCardsByUserIdNative(@Param("userId") Long userId);
+    List<PaymentCard> findCardsByUserId(@Param("userId") Long userId);
 
     @Query("SELECT pc FROM PaymentCard pc WHERE pc.user.id = :userId AND pc.active = true")
     List<PaymentCard> findActiveCardsByUserId(@Param("userId") Long userId);
