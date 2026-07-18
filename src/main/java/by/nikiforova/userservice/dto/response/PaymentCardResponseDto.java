@@ -1,0 +1,14 @@
+package by.nikiforova.userservice.dto.response;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+public record PaymentCardResponseDto (Long id,
+                                      Long userId,
+                                      String number,
+                                      String holder,
+                                      LocalDate expirationDate,
+                                      Boolean active,
+                                      LocalDateTime createdAt,
+                                      LocalDateTime updatedAt){
+}
