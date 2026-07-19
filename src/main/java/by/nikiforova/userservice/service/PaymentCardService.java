@@ -1,7 +1,10 @@
 package by.nikiforova.userservice.service;
 
+import by.nikiforova.userservice.dto.request.PaymentCardRequestDto;
+import by.nikiforova.userservice.dto.response.PaymentCardResponseDto;
 import by.nikiforova.userservice.entity.PaymentCard;
 import by.nikiforova.userservice.entity.User;
+import by.nikiforova.userservice.mapper.PaymentCardMapper;
 import by.nikiforova.userservice.repository.PaymentCardRepository;
 import by.nikiforova.userservice.repository.UserRepository;
 import by.nikiforova.userservice.specification.PaymentCardSpecification;
@@ -27,6 +30,7 @@ public class PaymentCardService {
 
     private final PaymentCardRepository paymentCardRepository;
     private final UserRepository userRepository;
+    private final PaymentCardMapper paymentCardMapper;
 
     @Transactional
     public PaymentCard createCard(Long userId) {
@@ -76,15 +80,18 @@ public class PaymentCardService {
     }
 
     @Transactional
-    public PaymentCard updateCard(Long id, String holder, LocalDate expirationDate) {
-        log.info("Updating card with id: {}", id);
+    public PaymentCardResponseDto updateCard(PaymentCardRequestDto dto) {
 
-        PaymentCard card = paymentCardRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Card not found with id: " + id));
-        card.setHolder(holder);
-        card.setExpirationDate(expirationDate);
+        PaymentCard paymentCard = paymentCardMapper.toEntity(dto);
 
-        return card;
+        log.info("Updating card with id: {}", paymentCard.getId());
+
+        PaymentCard cardToUpdate = paymentCardRepository.findById(paymentCard.getId())
+                .orElseThrow(() -> new RuntimeException("Card not found with id: " + paymentCard.getId()));
+        cardToUpdate.setHolder(paymentCard.getHolder());
+        cardToUpdate.setExpirationDate(paymentCard.getExpirationDate());
+
+        return paymentCardMapper.toResponseDto(cardToUpdate);
     }
 
     @Transactional
