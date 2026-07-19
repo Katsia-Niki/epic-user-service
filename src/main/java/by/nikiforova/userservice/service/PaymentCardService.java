@@ -79,18 +79,6 @@ public class PaymentCardService {
         return paymentCardRepository.findCardsByUserId(userId);
     }
 
-//    @Transactional
-//    public PaymentCard updateCard(Long id, String holder, LocalDate expirationDate) {
-//        log.info("Updating card with id: {}", id);
-//
-//        PaymentCard card = paymentCardRepository.findById(id)
-//                .orElseThrow(() -> new RuntimeException("Card not found with id: " + id));
-//        card.setHolder(holder);
-//        card.setExpirationDate(expirationDate);
-//
-//        return card;
-//    }
-
     @Transactional
     public PaymentCardResponseDto updateCard(PaymentCardRequestDto dto) {
 

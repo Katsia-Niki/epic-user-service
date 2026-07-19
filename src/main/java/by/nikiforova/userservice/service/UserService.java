@@ -22,26 +22,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-//    @Transactional
-//    public User createUser(String name, String surname, String email, LocalDate birthDate) {
-//        log.info("Starting user creation: email={}", email);
-//
-//        if (userRepository.existsByEmail(email)) {
-//            log.error("User with email already exists: {}", email);
-//            throw new RuntimeException("User with email already exists");
-//        }
-//
-//        User user = User.builder()
-//                .name(name)
-//                .surname(surname)
-//                .email(email)
-//                .birthDate(birthDate)
-//                .active(true)
-//                .build();
-//
-//        return userRepository.save(user);
-//    }
-
     @Transactional
     public UserResponseDto createUser(UserRequestDto dto) {
 
@@ -73,25 +53,6 @@ public class UserService {
 
         return userRepository.findAll(spec, pageable);
     }
-
-//    @Transactional
-//    public User updateUser(Long id, String name, String surname, String email, LocalDate birthDate) {
-//        log.info("Updating user with id: {}", id);
-//
-//        User user = userRepository.findById(id)
-//                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-//
-//        if (!user.getEmail().equals(email) && userRepository.existsByEmail(email)) {
-//            throw new RuntimeException("User with email already exists: " + email);
-//        }
-//
-//        user.setName(name);
-//        user.setSurname(surname);
-//        user.setEmail(email);
-//        user.setBirthDate(birthDate);
-//
-//        return user;
-//    }
 
     @Transactional
     public UserResponseDto updateUser(UserRequestDto dto) {
