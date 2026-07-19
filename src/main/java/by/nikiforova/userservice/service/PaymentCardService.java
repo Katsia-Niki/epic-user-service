@@ -4,6 +4,8 @@ import by.nikiforova.userservice.dto.request.PaymentCardRequestDto;
 import by.nikiforova.userservice.dto.response.PaymentCardResponseDto;
 import by.nikiforova.userservice.entity.PaymentCard;
 import by.nikiforova.userservice.entity.User;
+import by.nikiforova.userservice.exception.CardLimitExceededException;
+import by.nikiforova.userservice.exception.EntityNotFoundException;
 import by.nikiforova.userservice.mapper.PaymentCardMapper;
 import by.nikiforova.userservice.repository.PaymentCardRepository;
 import by.nikiforova.userservice.repository.UserRepository;
@@ -33,15 +35,15 @@ public class PaymentCardService {
     private final PaymentCardMapper paymentCardMapper;
 
     @Transactional
-    public PaymentCard createCard(Long userId) {
+    public PaymentCardResponseDto createCard(Long userId) {
 
         log.info("Starting card creation for userId: {}", userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
         if (isMaximumCardsPerUserReached(userId)) {
             log.error("Maximum cards reached for user: {}", userId);
-            throw new RuntimeException("Maximum cards reached for user: " + userId);
+            throw new CardLimitExceededException("Maximum cards reached for user: " + userId);
         }
 
         PaymentCard paymentCard = PaymentCard.builder()
@@ -51,69 +53,77 @@ public class PaymentCardService {
                 .expirationDate(LocalDate.now().plusYears(5))
                 .active(true).build();
 
-        return paymentCardRepository.save(paymentCard);
+        PaymentCard savedCard = paymentCardRepository.save(paymentCard);
+
+        return paymentCardMapper.toResponseDto(savedCard);
     }
 
     @Transactional(readOnly = true)
-    public PaymentCard getCardById(Long id) {
+    public PaymentCardResponseDto getCardById(Long id) {
         log.info("Fetching card by id: {}", id);
-
-        return paymentCardRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Card not found with id: " + id));
+        PaymentCard paymentCard = paymentCardRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Card not found with id: " + id));
+        return paymentCardMapper.toResponseDto(paymentCard);
     }
 
     @Transactional(readOnly = true)
-    public Page<PaymentCard> getAllCards(String name, String surname, Pageable pageable) {
+    public Page<PaymentCardResponseDto> getAllCards(String name, String surname, Pageable pageable) {
 
         Specification<PaymentCard> spec = Specification
                 .where(PaymentCardSpecification.hasUserName(name))
                 .and(PaymentCardSpecification.hasUserSurname(surname));
 
-        return paymentCardRepository.findAll(spec, pageable);
+        Page<PaymentCard> paymentCardPage = paymentCardRepository.findAll(spec, pageable);
+        return paymentCardMapper.toDtoPage(paymentCardPage);
     }
 
     @Transactional(readOnly = true)
-    public List<PaymentCard> getAllCardsByUserId(Long userId) {
+    public List<PaymentCardResponseDto> getAllCardsByUserId(Long userId) {
         log.info("Fetching cards by user id: {}", userId);
 
-        return paymentCardRepository.findCardsByUserId(userId);
+        if (!userRepository.existsById(userId)) {
+            throw new EntityNotFoundException("User not found with id: " + userId);
+        }
+
+        List<PaymentCard> cards = paymentCardRepository.findByUserId(userId);
+        return paymentCardMapper.toResponseDtoList(cards);
     }
 
     @Transactional
-    public PaymentCardResponseDto updateCard(PaymentCardRequestDto dto) {
+    public PaymentCardResponseDto updateCard(Long id, PaymentCardRequestDto dto) {
 
-        PaymentCard paymentCard = paymentCardMapper.toEntity(dto);
+        log.info("Updating card with id: {}", id);
 
-        log.info("Updating card with id: {}", paymentCard.getId());
+        PaymentCard cardToUpdate = paymentCardRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Card not found with id: " + id));
 
-        PaymentCard cardToUpdate = paymentCardRepository.findById(paymentCard.getId())
-                .orElseThrow(() -> new RuntimeException("Card not found with id: " + paymentCard.getId()));
-        cardToUpdate.setHolder(paymentCard.getHolder());
-        cardToUpdate.setExpirationDate(paymentCard.getExpirationDate());
+        paymentCardMapper.updateEntity(dto, cardToUpdate);
 
         return paymentCardMapper.toResponseDto(cardToUpdate);
     }
 
     @Transactional
-    public PaymentCard activateCard(Long id) {
+    public PaymentCardResponseDto activateCard(Long id) {
         log.info("Activating card with id: {}", id);
 
-        PaymentCard card = getCardById(id);
+        PaymentCard card = paymentCardRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Card not found with id: " + id));
 
         card.setActive(true);
 
-        return card;
+        return paymentCardMapper.toResponseDto(card);
     }
 
     @Transactional
-    public PaymentCard deactivateCard(Long id) {
+    public PaymentCardResponseDto deactivateCard(Long id) {
         log.info("Deactivating card with id: {}", id);
 
-        PaymentCard card = getCardById(id);
+        PaymentCard card = paymentCardRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Card not found with id: " + id));
 
         card.setActive(false);
 
-        return card;
+        return paymentCardMapper.toResponseDto(card);
     }
 
     private boolean isMaximumCardsPerUserReached(Long userId) {

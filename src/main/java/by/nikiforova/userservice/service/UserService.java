@@ -3,6 +3,8 @@ package by.nikiforova.userservice.service;
 import by.nikiforova.userservice.dto.request.UserRequestDto;
 import by.nikiforova.userservice.dto.response.UserResponseDto;
 import by.nikiforova.userservice.entity.User;
+import by.nikiforova.userservice.exception.UserAlreadyExistsException;
+import by.nikiforova.userservice.exception.EntityNotFoundException;
 import by.nikiforova.userservice.mapper.UserMapper;
 import by.nikiforova.userservice.repository.UserRepository;
 import by.nikiforova.userservice.specification.UserSpecification;
@@ -30,7 +32,7 @@ public class UserService {
 
         if (userRepository.existsByEmail(user.getEmail())) {
             log.error("User with email already exists: {}", user.getEmail());
-            throw new RuntimeException("User with email already exists");
+            throw new UserAlreadyExistsException("User with email already exists");
         }
         User savedUser = userRepository.save(user);
         savedUser.setActive(true);
@@ -38,57 +40,58 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public User getUserById(Long id) {
+    public UserResponseDto getUserById(Long id) {
         log.info("Fetching user by id: {}", id);
 
-        return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+         User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+
+        return userMapper.toResponseDto(user);
     }
 
-    public Page<User> getAllUsers(String name, String surname, Pageable pageable) {
+    @Transactional(readOnly = true)
+    public Page<UserResponseDto> getAllUsers(String name, String surname, Pageable pageable) {
 
         Specification<User> spec = Specification
                 .where(UserSpecification.hasName(name))
                 .and(UserSpecification.hasSurname(surname));
 
-        return userRepository.findAll(spec, pageable);
+        Page<User> userPage = userRepository.findAll(spec, pageable);
+
+        return userMapper.toDtoPage(userPage);
     }
 
     @Transactional
-    public UserResponseDto updateUser(UserRequestDto dto) {
-        User user = userMapper.toEntity(dto);
+    public UserResponseDto updateUser(Long id, UserRequestDto dto) {
 
-        log.info("Updating user with id: {}", user.getId());
+        log.info("Updating user with id: {}", id);
 
-        User foundUser = userRepository.findById(user.getId())
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + user.getId()));
+        User foundUser = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
 
-        if (!foundUser.getEmail().equals(user.getEmail()) && userRepository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("User with email already exists: " + user.getEmail());
+        if (!foundUser.getEmail().equals(dto.email()) && userRepository.existsByEmail(dto.email())) {
+            throw new UserAlreadyExistsException("User with email already exists: " + dto.email());
         }
-
-        foundUser.setName(user.getName());
-        foundUser.setSurname(user.getSurname());
-        foundUser.setEmail(user.getEmail());
-        foundUser.setBirthDate(user.getBirthDate());
-
+        userMapper.updateEntity(dto, foundUser);
         return userMapper.toResponseDto(foundUser);
     }
 
     @Transactional
-    public User activateUser(Long id) {
+    public UserResponseDto activateUser(Long id) {
         log.info("Activating user with id: {}", id);
-        User user = getUserById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
         user.setActive(true);
-        return user;
+        return userMapper.toResponseDto(user);
     }
 
     @Transactional
-    public User deactivateUser(Long id) {
+    public UserResponseDto deactivateUser(Long id) {
         log.info("Deactivating user with id: {}", id);
-        User user = getUserById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
         user.setActive(false);
-        return user;
+        return userMapper.toResponseDto(user);
     }
 
 }
