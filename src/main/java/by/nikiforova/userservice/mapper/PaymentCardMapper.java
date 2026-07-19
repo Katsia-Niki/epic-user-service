@@ -17,6 +17,10 @@ public interface PaymentCardMapper {
     PaymentCard toEntity(PaymentCardRequestDto dto);
     PaymentCardResponseDto toResponseDto(PaymentCard card);
     void updateEntity(PaymentCardRequestDto dto, @MappingTarget PaymentCard card);
-    Page<PaymentCardResponseDto> toDtoPage(Page<PaymentCard> userPage);
+
+    default Page<PaymentCardResponseDto> toDtoPage(Page<PaymentCard> cardPage) {
+        return cardPage.map(card -> toResponseDto(card));
+    }
+
     List<PaymentCardResponseDto> toResponseDtoList(List<PaymentCard> cards);
 }

@@ -13,5 +13,8 @@ public interface UserMapper {
     User toEntity(UserRequestDto dto);
     void updateEntity(UserRequestDto dto, @MappingTarget User user);
     UserResponseDto toResponseDto(User user);
-    Page<UserResponseDto> toDtoPage(Page<User> userPage);
+
+    default Page<UserResponseDto> toDtoPage(Page<User> userPage) {
+        return userPage.map(user -> toResponseDto(user));
+    }
 }
