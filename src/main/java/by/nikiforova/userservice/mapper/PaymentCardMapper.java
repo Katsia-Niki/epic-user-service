@@ -8,6 +8,8 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface PaymentCardMapper {
+
+    PaymentCard toEntity(PaymentCardRequestDto dto);
     PaymentCardResponseDto toResponseDto(PaymentCard card);
     void updateEntity(PaymentCardRequestDto dto, @MappingTarget PaymentCard card);
 }
