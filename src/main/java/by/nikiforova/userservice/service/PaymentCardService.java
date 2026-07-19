@@ -99,7 +99,7 @@ public class PaymentCardService {
         log.info("Updating card with id: {}", paymentCard.getId());
 
         PaymentCard cardToUpdate = paymentCardRepository.findById(paymentCard.getId())
-                .orElseThrow(() -> new RuntimeException("Card not found with id: " + paymentCard.getId());
+                .orElseThrow(() -> new RuntimeException("Card not found with id: " + paymentCard.getId()));
         cardToUpdate.setHolder(paymentCard.getHolder());
         cardToUpdate.setExpirationDate(paymentCard.getExpirationDate());
 
