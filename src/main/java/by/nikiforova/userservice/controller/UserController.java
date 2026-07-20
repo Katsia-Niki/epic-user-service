@@ -2,6 +2,7 @@ package by.nikiforova.userservice.controller;
 
 import by.nikiforova.userservice.dto.request.UserRequestDto;
 import by.nikiforova.userservice.dto.response.UserResponseDto;
+import by.nikiforova.userservice.dto.response.UserWithCardsResponseDto;
 import by.nikiforova.userservice.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDto> getUserById(
+    public ResponseEntity<UserWithCardsResponseDto> getUserById(
             @PathVariable Long id) {
         log.info("Getting user with id {}", id);
         return ResponseEntity.ok(userService.getUserById(id));
@@ -49,6 +50,13 @@ public class UserController {
     ) {
         log.info("Updating user with id {}", id);
         return ResponseEntity.ok(userService.updateUser(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        log.info("Deleting user with id {}", id);
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/activate")

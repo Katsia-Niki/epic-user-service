@@ -1,7 +1,9 @@
 package by.nikiforova.userservice.service;
 
+import by.nikiforova.userservice.config.CacheConfig;
 import by.nikiforova.userservice.dto.request.UserRequestDto;
 import by.nikiforova.userservice.dto.response.UserResponseDto;
+import by.nikiforova.userservice.dto.response.UserWithCardsResponseDto;
 import by.nikiforova.userservice.entity.User;
 import by.nikiforova.userservice.exception.UserAlreadyExistsException;
 import by.nikiforova.userservice.exception.EntityNotFoundException;
@@ -9,6 +11,8 @@ import by.nikiforova.userservice.mapper.UserMapper;
 import by.nikiforova.userservice.repository.UserRepository;
 import by.nikiforova.userservice.specification.UserSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
+    private static final String USER_NOT_FOUND_MESSAGE = "User not found with id: ";
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -39,15 +45,23 @@ public class UserService {
         return userMapper.toResponseDto(savedUser);
     }
 
+    @Cacheable(value = CacheConfig.USERS_WITH_CARDS_CACHE, key = "#id")
     @Transactional(readOnly = true)
-    public UserResponseDto getUserById(Long id) {
-        log.info("Fetching user by id: {}", id);
-
-         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
-
-        return userMapper.toResponseDto(user);
+    public UserWithCardsResponseDto getUserById(Long id) {
+        User user = userRepository.findWithPaymentCardsById(id)
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE + id));
+        return userMapper.toWithCardsResponseDto(user);
     }
+
+//    @Transactional(readOnly = true)
+//    public UserResponseDto getUserById(Long id) {
+//        log.info("Fetching user by id: {}", id);
+//
+//         User user = userRepository.findById(id)
+//                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+//
+//        return userMapper.toResponseDto(user);
+//    }
 
     @Transactional(readOnly = true)
     public Page<UserResponseDto> getAllUsers(String name, String surname, Pageable pageable) {
@@ -62,12 +76,13 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(value = CacheConfig.USERS_WITH_CARDS_CACHE, key = "#id")
     public UserResponseDto updateUser(Long id, UserRequestDto dto) {
 
         log.info("Updating user with id: {}", id);
 
         User foundUser = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE + id));
 
         if (!foundUser.getEmail().equals(dto.email()) && userRepository.existsByEmail(dto.email())) {
             throw new UserAlreadyExistsException("User with email already exists: " + dto.email());
@@ -77,19 +92,30 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(value = CacheConfig.USERS_WITH_CARDS_CACHE, key = "#id")
+    public void deleteUser(Long id) {
+        log.info("Deleting user with id: {}", id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE + id));
+        userRepository.delete(user);
+    }
+
+    @Transactional
+    @CacheEvict(value = CacheConfig.USERS_WITH_CARDS_CACHE, key = "#id")
     public UserResponseDto activateUser(Long id) {
         log.info("Activating user with id: {}", id);
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE + id));
         user.setActive(true);
         return userMapper.toResponseDto(user);
     }
 
     @Transactional
+    @CacheEvict(value = CacheConfig.USERS_WITH_CARDS_CACHE, key = "#id")
     public UserResponseDto deactivateUser(Long id) {
         log.info("Deactivating user with id: {}", id);
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE + id));
         user.setActive(false);
         return userMapper.toResponseDto(user);
     }
