@@ -2,9 +2,7 @@ package by.nikiforova.userservice.mapper;
 
 import by.nikiforova.userservice.dto.request.PaymentCardRequestDto;
 import by.nikiforova.userservice.dto.response.PaymentCardResponseDto;
-import by.nikiforova.userservice.dto.response.UserResponseDto;
 import by.nikiforova.userservice.entity.PaymentCard;
-import by.nikiforova.userservice.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.springframework.data.domain.Page;
@@ -19,7 +17,7 @@ public interface PaymentCardMapper {
     void updateEntity(PaymentCardRequestDto dto, @MappingTarget PaymentCard card);
 
     default Page<PaymentCardResponseDto> toDtoPage(Page<PaymentCard> cardPage) {
-        return cardPage.map(card -> toResponseDto(card));
+        return cardPage.map(this::toResponseDto);
     }
 
     List<PaymentCardResponseDto> toResponseDtoList(List<PaymentCard> cards);

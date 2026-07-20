@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 @Slf4j
@@ -54,7 +55,7 @@ public class PaymentCardService {
                 .user(user)
                 .number(generateUniqueCardNumber())
                 .holder(user.getName() + " " + user.getSurname())
-                .expirationDate(LocalDate.now().plusYears(5))
+                .expirationDate(LocalDate.now(ZoneId.of("Europe/Minsk")).plusYears(5))
                 .active(true).build();
 
         PaymentCard savedCard = paymentCardRepository.save(paymentCard);
