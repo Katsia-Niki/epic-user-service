@@ -53,16 +53,6 @@ public class UserService {
         return userMapper.toWithCardsResponseDto(user);
     }
 
-//    @Transactional(readOnly = true)
-//    public UserResponseDto getUserById(Long id) {
-//        log.info("Fetching user by id: {}", id);
-//
-//         User user = userRepository.findById(id)
-//                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
-//
-//        return userMapper.toResponseDto(user);
-//    }
-
     @Transactional(readOnly = true)
     public Page<UserResponseDto> getAllUsers(String name, String surname, Pageable pageable) {
 
