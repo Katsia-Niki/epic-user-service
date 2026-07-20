@@ -1,6 +1,6 @@
 package by.nikiforova.userservice.service;
 
-import by.nikiforova.userservice.config.CacheConfig;
+import by.nikiforova.userservice.constant.Constants;
 import by.nikiforova.userservice.dto.request.PaymentCardRequestDto;
 import by.nikiforova.userservice.dto.response.PaymentCardResponseDto;
 import by.nikiforova.userservice.entity.PaymentCard;
@@ -25,13 +25,14 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 
+import static by.nikiforova.userservice.constant.Constants.CARD_NOT_FOUND_MESSAGE;
+import static by.nikiforova.userservice.constant.Constants.MAX_CARDS_PER_USER;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentCardService {
 
-    private static final int MAX_CARDS_PER_USER = 5;
-    private static final String CARD_NOT_FOUND_MESSAGE = "Card not found with id: ";
     private final PaymentCardRepository paymentCardRepository;
     private static final SecureRandom secureRandom = new SecureRandom();
 
@@ -39,7 +40,7 @@ public class PaymentCardService {
     private final PaymentCardMapper paymentCardMapper;
 
     @Transactional
-    @CacheEvict(value = CacheConfig.USERS_WITH_CARDS_CACHE, key = "#userId")
+    @CacheEvict(value = Constants.USERS_WITH_CARDS_CACHE, key = "#userId")
     public PaymentCardResponseDto createCard(Long userId) {
 
         log.info("Starting card creation for userId: {}", userId);
@@ -95,7 +96,7 @@ public class PaymentCardService {
     }
 
     @Transactional
-    @CacheEvict(value = CacheConfig.USERS_WITH_CARDS_CACHE, key = "#result.userId")
+    @CacheEvict(value = Constants.USERS_WITH_CARDS_CACHE, key = "#result.userId")
     public PaymentCardResponseDto updateCard(Long id, PaymentCardRequestDto dto) {
 
         log.info("Updating card with id: {}", id);
@@ -109,7 +110,7 @@ public class PaymentCardService {
     }
 
     @Transactional
-    @CacheEvict(value = CacheConfig.USERS_WITH_CARDS_CACHE, key = "#result.userId")
+    @CacheEvict(value = Constants.USERS_WITH_CARDS_CACHE, key = "#result.userId")
     public PaymentCardResponseDto activateCard(Long id) {
         log.info("Activating card with id: {}", id);
 
@@ -122,7 +123,7 @@ public class PaymentCardService {
     }
 
     @Transactional
-    @CacheEvict(value = CacheConfig.USERS_WITH_CARDS_CACHE, key = "#result.userId")
+    @CacheEvict(value = Constants.USERS_WITH_CARDS_CACHE, key = "#result.userId")
     public PaymentCardResponseDto deactivateCard(Long id) {
         log.info("Deactivating card with id: {}", id);
 

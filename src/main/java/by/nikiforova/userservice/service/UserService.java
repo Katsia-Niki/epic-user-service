@@ -1,6 +1,6 @@
 package by.nikiforova.userservice.service;
 
-import by.nikiforova.userservice.config.CacheConfig;
+import by.nikiforova.userservice.constant.Constants;
 import by.nikiforova.userservice.dto.request.UserRequestDto;
 import by.nikiforova.userservice.dto.response.UserResponseDto;
 import by.nikiforova.userservice.dto.response.UserWithCardsResponseDto;
@@ -20,12 +20,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static by.nikiforova.userservice.constant.Constants.USER_NOT_FOUND_MESSAGE;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
-
-    private static final String USER_NOT_FOUND_MESSAGE = "User not found with id: ";
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -45,7 +45,7 @@ public class UserService {
         return userMapper.toResponseDto(savedUser);
     }
 
-    @Cacheable(value = CacheConfig.USERS_WITH_CARDS_CACHE, key = "#id")
+    @Cacheable(value = Constants.USERS_WITH_CARDS_CACHE, key = "#id")
     @Transactional(readOnly = true)
     public UserWithCardsResponseDto getUserById(Long id) {
         User user = userRepository.findWithPaymentCardsById(id)
@@ -66,7 +66,7 @@ public class UserService {
     }
 
     @Transactional
-    @CacheEvict(value = CacheConfig.USERS_WITH_CARDS_CACHE, key = "#id")
+    @CacheEvict(value = Constants.USERS_WITH_CARDS_CACHE, key = "#id")
     public UserResponseDto updateUser(Long id, UserRequestDto dto) {
 
         log.info("Updating user with id: {}", id);
@@ -82,7 +82,7 @@ public class UserService {
     }
 
     @Transactional
-    @CacheEvict(value = CacheConfig.USERS_WITH_CARDS_CACHE, key = "#id")
+    @CacheEvict(value = Constants.USERS_WITH_CARDS_CACHE, key = "#id")
     public void deleteUser(Long id) {
         log.info("Deleting user with id: {}", id);
         User user = userRepository.findById(id)
@@ -91,7 +91,7 @@ public class UserService {
     }
 
     @Transactional
-    @CacheEvict(value = CacheConfig.USERS_WITH_CARDS_CACHE, key = "#id")
+    @CacheEvict(value = Constants.USERS_WITH_CARDS_CACHE, key = "#id")
     public UserResponseDto activateUser(Long id) {
         log.info("Activating user with id: {}", id);
         User user = userRepository.findById(id)
@@ -101,7 +101,7 @@ public class UserService {
     }
 
     @Transactional
-    @CacheEvict(value = CacheConfig.USERS_WITH_CARDS_CACHE, key = "#id")
+    @CacheEvict(value = Constants.USERS_WITH_CARDS_CACHE, key = "#id")
     public UserResponseDto deactivateUser(Long id) {
         log.info("Deactivating user with id: {}", id);
         User user = userRepository.findById(id)

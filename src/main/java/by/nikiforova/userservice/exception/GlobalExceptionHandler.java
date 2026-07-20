@@ -15,6 +15,8 @@ import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 
+import static by.nikiforova.userservice.constant.Constants.TIMEZONE;
+
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
@@ -24,7 +26,7 @@ public class GlobalExceptionHandler {
             EntityNotFoundException e, HttpServletRequest request) {
         log.error(e.getMessage());
         ErrorResponse response = new ErrorResponse(
-                LocalDateTime.now(ZoneId.of("Europe/Minsk")),
+                LocalDateTime.now(ZoneId.of(TIMEZONE)),
                 HttpStatus.NOT_FOUND.value(),
                 e.getMessage(),
                 request.getRequestURI(),
@@ -38,7 +40,7 @@ public class GlobalExceptionHandler {
             CardLimitExceededException e, HttpServletRequest request) {
         log.error(e.getMessage());
         ErrorResponse response = new ErrorResponse(
-                LocalDateTime.now(ZoneId.of("Europe/Minsk")),
+                LocalDateTime.now(ZoneId.of(TIMEZONE)),
                 HttpStatus.CONFLICT.value(),
                 e.getMessage(),
                 request.getRequestURI(),
@@ -53,7 +55,7 @@ public class GlobalExceptionHandler {
             UserAlreadyExistsException e, HttpServletRequest request) {
         log.error(e.getMessage());
         ErrorResponse response = new ErrorResponse(
-                LocalDateTime.now(ZoneId.of("Europe/Minsk")),
+                LocalDateTime.now(ZoneId.of(TIMEZONE)),
                 HttpStatus.CONFLICT.value(),
                 e.getMessage(),
                 request.getRequestURI(),
@@ -73,7 +75,7 @@ public class GlobalExceptionHandler {
         }
 
         ErrorResponse response = new ErrorResponse(
-                LocalDateTime.now(ZoneId.of("Europe/Minsk")),
+                LocalDateTime.now(ZoneId.of(TIMEZONE)),
                 HttpStatus.BAD_REQUEST.value(),
                 "Validation failed",
                 request.getRequestURI(),
@@ -86,7 +88,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleUnexpectedExceptions(Exception e, HttpServletRequest request) {
         log.error("Unexpected exception: {}", e.getMessage(), e);
         ErrorResponse response = new ErrorResponse(
-                LocalDateTime.now(ZoneId.of("Europe/Minsk")),
+                LocalDateTime.now(ZoneId.of(TIMEZONE)),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Internal server error",
                 request.getRequestURI(),
