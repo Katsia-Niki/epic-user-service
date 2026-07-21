@@ -22,15 +22,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 import java.util.Optional;
 
 import static by.nikiforova.userservice.constant.Constants.CARD_NOT_FOUND_MESSAGE;
 import static by.nikiforova.userservice.constant.Constants.MAX_CARDS_PER_USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -60,7 +59,7 @@ class PaymentCardServiceTest {
         user = User.builder()
                 .name("Katsiaryna")
                 .surname("Nikifarava")
-                .birthDate(LocalDate.of(1993, 4, 14))
+                .birthDate(LocalDate.of(1993, Month.APRIL, 14))
                 .email("katsiaryna.niki@gmail.com")
                 .build();
         user.setId(1L);
@@ -69,16 +68,16 @@ class PaymentCardServiceTest {
                 .user(user)
                 .number("1234567891234567")
                 .holder(user.getName() + " " + user.getSurname())
-                .expirationDate(LocalDate.of(2030, 4, 25))
+                .expirationDate(LocalDate.of(2030, Month.APRIL, 25))
                 .active(true)
                 .build();
         paymentCard.setId(1L);
 
         paymentCardRequestDto = new PaymentCardRequestDto(user.getName() + " " + user.getSurname(),
-                LocalDate.of(2030, 4, 25));
+                LocalDate.of(2030, Month.APRIL, 25));
 
         paymentCardResponseDto = new PaymentCardResponseDto(1L, 1L, "1234567891234567",
-                user.getName() + " " + user.getSurname(), LocalDate.of(2030, 4, 25),
+                user.getName() + " " + user.getSurname(), LocalDate.of(2030, Month.APRIL, 25),
                 true, null, null);
     }
 

@@ -72,6 +72,26 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void shouldReturnPageOfUsers() throws Exception {
+        createUser();
+        mockMvc.perform(get("/api/users"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").value(1));
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenUserDataInvalid() throws Exception {
+        UserRequestDto invalid = new UserRequestDto("", "Niki", "not-email", LocalDate.now());
+        mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalid)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Validation failed"))
+                .andExpect(jsonPath("$.errors.email").exists());
+    }
+
+    @Test
     void shouldUpdateUserInDatabase() throws Exception {
         UserResponseDto createdUser = createUser();
 

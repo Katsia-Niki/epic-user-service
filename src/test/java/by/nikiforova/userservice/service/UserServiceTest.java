@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,14 +48,14 @@ class UserServiceTest {
         user = User.builder()
                 .name("Katsiaryna")
                 .surname("Nikifarava")
-                .birthDate(LocalDate.of(1993, 4, 14))
+                .birthDate(LocalDate.of(1993, Month.APRIL, 14))
                 .email("katsiaryna.niki@gmail.com")
                 .build();
         user.setId(1L);
         userRequestDto = new UserRequestDto("Katsiaryna", "Nikifarava",
-                "katsiaryna.niki@gmail.com", LocalDate.of(1993, 4, 14));
+                "katsiaryna.niki@gmail.com", LocalDate.of(1993, Month.APRIL, 14));
         userResponseDto = new UserResponseDto(1L, "Katsiaryna", "Nikifarava",
-                "katsiaryna.niki@gmail.com", LocalDate.of(1993, 4, 14),
+                "katsiaryna.niki@gmail.com", LocalDate.of(1993, Month.APRIL, 14),
                 true, null, null);
     }
 
@@ -93,7 +94,7 @@ class UserServiceTest {
                 "Katsiaryna",
                 "Nikifarava",
                 "katsiaryna.niki@gmail.com",
-                LocalDate.of(1993, 4, 14),
+                LocalDate.of(1993, Month.APRIL, 14),
                 true,
                 List.of(),
                 null,
@@ -182,7 +183,7 @@ class UserServiceTest {
                 "Katsiaryna",
                 "Nikifarava",
                 "katsia-niki@gmail.com",  // other email
-                LocalDate.of(1993, 4, 14)
+                LocalDate.of(1993, Month.APRIL, 14)
         );
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));

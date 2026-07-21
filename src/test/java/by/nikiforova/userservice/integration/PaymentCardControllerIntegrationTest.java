@@ -87,6 +87,18 @@ class PaymentCardControllerIntegrationTest extends AbstractIntegrationTest {
                 .andExpect(status().isNoContent());
     }
 
+    @Test
+    void shouldReturnConflictWhenCardLimitExceeded() throws Exception {
+        UserResponseDto user = createUser();
+        for (int i = 0; i < 5; i++) {
+            mockMvc.perform(post("/api/cards/users/{userId}", user.id()))
+                    .andExpect(status().isCreated());
+        }
+        mockMvc.perform(post("/api/cards/users/{userId}", user.id()))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Maximum cards reached for user: " + user.id()));
+    }
+
     private UserResponseDto createUser() throws Exception {
         UserRequestDto request = new UserRequestDto(
                 "Katsiaryna",
