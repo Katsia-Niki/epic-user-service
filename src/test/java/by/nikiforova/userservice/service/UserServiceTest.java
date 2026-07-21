@@ -222,4 +222,33 @@ class UserServiceTest {
         verify(userRepository, never()).delete(user);
     }
 
+    @Test
+    void activateUserWhenUserExistsShouldActivate() {
+        user.setActive(false);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userMapper.toResponseDto(user)).thenReturn(userResponseDto);
+
+        UserResponseDto result = userService.activateUser(1L);
+
+        assertEquals(true, user.getActive());
+        assertEquals(userResponseDto, result);
+
+        verify(userRepository).findById(1L);
+        verify(userMapper).toResponseDto(user);
+    }
+
+    @Test
+    void deactivateUserWhenUserExistsShouldDeactivate() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userMapper.toResponseDto(user)).thenReturn(userResponseDto);
+
+        UserResponseDto result = userService.deactivateUser(1L);
+
+        assertEquals(false, user.getActive());
+        assertEquals(userResponseDto, result);
+
+        verify(userRepository).findById(1L);
+        verify(userMapper).toResponseDto(user);
+    }
+
 }

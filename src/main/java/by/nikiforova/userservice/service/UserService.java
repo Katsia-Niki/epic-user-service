@@ -40,8 +40,8 @@ public class UserService {
             log.error("User with email already exists: {}", user.getEmail());
             throw new UserAlreadyExistsException("User with email already exists");
         }
+        user.setActive(true);
         User savedUser = userRepository.save(user);
-        savedUser.setActive(true);
         return userMapper.toResponseDto(savedUser);
     }
 
@@ -109,5 +109,6 @@ public class UserService {
         user.setActive(false);
         return userMapper.toResponseDto(user);
     }
+
 
 }

@@ -3,3 +3,10 @@ services:
     image: redis:7
     ports:
       - "6379:6379"
+  sonarqube:
+    image: sonarqube:lts-community
+    container_name: sonarqube
+    ports:
+      - "9000:9000"
+    environment:
+      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
