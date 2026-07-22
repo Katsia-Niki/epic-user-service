@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.ZoneId;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -145,7 +146,7 @@ class PaymentCardControllerIntegrationTest extends AbstractIntegrationTest {
                 "Katsiaryna",
                 "Nikifarava",
                 "katsiaryna.niki@gmail.com",
-                LocalDate.of(1993, 4, 14)
+                LocalDate.of(1993, Month.APRIL, 14)
         );
 
         MvcResult result = mockMvc.perform(post("/api/users")

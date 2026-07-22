@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDate;
+import java.time.Month;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -22,7 +23,7 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
             "Katsiaryna",
             "Nikifarava",
             "katsiaryna.niki@gmail.com",
-            LocalDate.of(1993, 4, 14)
+            LocalDate.of(1993, Month.APRIL, 14)
     );
 
     @Test
