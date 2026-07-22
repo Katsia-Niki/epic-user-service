@@ -155,4 +155,27 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
         return objectMapper.readValue(result.getResponse().getContentAsString(), UserResponseDto.class);
     }
 
+    @Test
+    void shouldFilterUsersByNameAndSurname() throws Exception {
+        createUser();
+
+        mockMvc.perform(get("/api/users")
+                        .param("name", "Katsia")
+                        .param("surname", "Nikif"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].email").value(USER_REQUEST.email()));
+    }
+
+    @Test
+    void shouldReturnEmptyPageWhenUserFilterDoesNotMatch() throws Exception {
+        createUser();
+
+        mockMvc.perform(get("/api/users")
+                        .param("name", "Nfjdkhkd")
+                        .param("surname", "FJKHDKD"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(0));
+    }
+
 }
