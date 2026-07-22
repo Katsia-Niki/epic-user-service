@@ -87,6 +87,47 @@ class PaymentCardControllerIntegrationTest extends AbstractIntegrationTest {
                 .andExpect(status().isNoContent());
     }
 
+    @Test
+    void shouldGetAllCardsWithFilters() throws Exception {
+        UserResponseDto user = createUser();
+
+        mockMvc.perform(post("/api/cards/users/{userId}", user.id()))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/api/cards")
+                        .param("name", "Katsia")
+                        .param("surname", "Nikif"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].userId").value(user.id()));
+    }
+
+    @Test
+    void shouldGetCardById() throws Exception {
+        UserResponseDto user = createUser();
+
+        MvcResult createCardResult = mockMvc.perform(post("/api/cards/users/{userId}", user.id()))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        PaymentCardResponseDto createdCard = objectMapper.readValue(
+                createCardResult.getResponse().getContentAsString(),
+                PaymentCardResponseDto.class);
+
+        mockMvc.perform(get("/api/cards/{id}", createdCard.id()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(createdCard.id()))
+                .andExpect(jsonPath("$.userId").value(user.id()))
+                .andExpect(jsonPath("$.active").value(true));
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenCardDoesNotExist() throws Exception {
+        mockMvc.perform(get("/api/cards/{id}", 9999))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Card not found with id: 9999"));
+    }
+
     private UserResponseDto createUser() throws Exception {
         UserRequestDto request = new UserRequestDto(
                 "Katsiaryna",
