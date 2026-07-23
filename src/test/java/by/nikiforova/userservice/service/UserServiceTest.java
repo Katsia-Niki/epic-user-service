@@ -9,6 +9,7 @@ import by.nikiforova.userservice.exception.UserAlreadyExistsException;
 import by.nikiforova.userservice.mapper.UserMapper;
 import by.nikiforova.userservice.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -60,6 +61,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("create user - success")
     void createUserWhenEmailIsUniqueShouldSaveAndReturnDto() {
         when(userMapper.toEntity(userRequestDto)).thenReturn(user);
         when(userRepository.existsByEmail(user.getEmail())).thenReturn(false);
@@ -76,6 +78,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("create user - UserAlreadyExistsException")
     void createUserWhenEmailAlreadyExistsShouldThrowException() {
         when(userMapper.toEntity(userRequestDto)).thenReturn(user);
         when(userRepository.existsByEmail(user.getEmail())).thenReturn(true);
@@ -88,6 +91,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("get user by id - success")
     void getUserByIdWhenUserExistsShouldReturnUserWithCardsDto() {
         UserWithCardsResponseDto expectedDto = new UserWithCardsResponseDto(
                 1L,
@@ -112,6 +116,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("get user by id - EntityNotFoundException")
     void getUserByIdWhenUserDoesNotExistShouldThrowException() {
         when(userRepository.findWithPaymentCardsById(2L)).thenReturn(Optional.empty());
 
@@ -126,6 +131,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("get all users - success")
     void getAllUsersShouldReturnPageOfDto() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<User> userPage = new PageImpl<>(List.of(user));
@@ -144,6 +150,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("update user - success")
     void updateUserWhenUserExistsShouldUpdateAndReturnDto() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userMapper.toResponseDto(user)).thenReturn(userResponseDto);
@@ -161,6 +168,7 @@ class UserServiceTest {
 
 
     @Test
+    @DisplayName("update user - EntityNotFoundException")
     void updateUserWhenUserNotFoundShouldThrowEntityNotFoundException() {
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
 
@@ -178,6 +186,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("update user - UserAlreadyExistsException")
     void updateUserWhenEmailAlreadyExistsShouldThrowException() {
         UserRequestDto dtoWithNewEmail = new UserRequestDto(
                 "Katsiaryna",
@@ -200,6 +209,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("delete user - success")
     void deleteUserWhenUserExistsShouldDelete () {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         userService.deleteUser(1L);
@@ -210,6 +220,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("delete user - EntityNotFoundException")
     void deleteUserWhenUserNotFoundShouldThrowException() {
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
 
@@ -224,6 +235,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("activate user - success")
     void activateUserWhenUserExistsShouldActivate() {
         user.setActive(false);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
@@ -239,6 +251,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("deactivate user - success")
     void deactivateUserWhenUserExistsShouldDeactivate() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userMapper.toResponseDto(user)).thenReturn(userResponseDto);

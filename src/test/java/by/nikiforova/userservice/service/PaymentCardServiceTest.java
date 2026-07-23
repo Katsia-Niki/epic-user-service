@@ -10,6 +10,7 @@ import by.nikiforova.userservice.mapper.PaymentCardMapper;
 import by.nikiforova.userservice.repository.PaymentCardRepository;
 import by.nikiforova.userservice.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -82,6 +83,7 @@ class PaymentCardServiceTest {
     }
 
     @Test
+    @DisplayName("create card - success")
     void createPaymentCardWhenUserExistsShouldCreateAndReturnDto() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(paymentCardRepository.countByUserId(1L)).thenReturn(0);
@@ -98,6 +100,7 @@ class PaymentCardServiceTest {
     }
 
     @Test
+    @DisplayName("create card - EntityNotFoundException")
     void createCardWhenUserNotFoundShouldThrowException() {
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
 
@@ -112,6 +115,7 @@ class PaymentCardServiceTest {
     }
 
     @Test
+    @DisplayName("create card - CardLimitExceededException")
     void createCardWhenMaximumCardsReachedShouldThrowException() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(paymentCardRepository.countByUserId(1L)).thenReturn(MAX_CARDS_PER_USER);
@@ -126,6 +130,7 @@ class PaymentCardServiceTest {
     }
 
     @Test
+    @DisplayName("get card by id - success")
     void getCardByIdWhenCardExistsShouldReturnDto() {
         when(paymentCardRepository.findById(1L)).thenReturn(Optional.of(paymentCard));
         when(paymentCardMapper.toResponseDto(paymentCard)).thenReturn(paymentCardResponseDto);
@@ -139,6 +144,7 @@ class PaymentCardServiceTest {
     }
 
     @Test
+    @DisplayName("get card by id - EntityNotFoundException")
     void getCardByIdWhenCardNotFoundShouldThrowException() {
         when(paymentCardRepository.findById(2L)).thenReturn(Optional.empty());
 
@@ -154,6 +160,7 @@ class PaymentCardServiceTest {
     }
 
     @Test
+    @DisplayName("get all cards - success")
     void getAllCardsShouldReturnPageOfDto() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<PaymentCard> cardPage = new PageImpl<>(List.of(paymentCard));
@@ -171,6 +178,7 @@ class PaymentCardServiceTest {
     }
 
     @Test
+    @DisplayName("get all cards by user id - success")
     void getAllCardsByUserIdWhenUserExistsShouldReturnList() {
         when(userRepository.existsById(1L)).thenReturn(true);
         when(paymentCardRepository.findByUserId(1L)).thenReturn(List.of(paymentCard));
@@ -187,6 +195,7 @@ class PaymentCardServiceTest {
     }
 
     @Test
+    @DisplayName("get all cards by user id - EntityNotFoundException")
     void getAllCardsByUserIdWhenUserNotFoundShouldThrowException() {
         when(userRepository.existsById(2L)).thenReturn(false);
 
@@ -201,6 +210,7 @@ class PaymentCardServiceTest {
     }
 
     @Test
+    @DisplayName("update card - success")
     void updateCardWhenCardExistsShouldUpdateAndReturnDto() {
         when(paymentCardRepository.findById(1L)).thenReturn(Optional.of(paymentCard));
         when(paymentCardMapper.toResponseDto(paymentCard)).thenReturn(paymentCardResponseDto);
@@ -215,6 +225,7 @@ class PaymentCardServiceTest {
     }
 
     @Test
+    @DisplayName("update card - EntityNotFoundException")
     void updateCardWhenCardNotFoundShouldThrowException() {
         when(paymentCardRepository.findById(2L)).thenReturn(Optional.empty());
 
@@ -231,6 +242,7 @@ class PaymentCardServiceTest {
     }
 
     @Test
+    @DisplayName("activate card - success")
     void activateCardWhenCardExistsShouldActivate() {
         paymentCard.setActive(false);
         when(paymentCardRepository.findById(1L)).thenReturn(Optional.of(paymentCard));
@@ -246,6 +258,7 @@ class PaymentCardServiceTest {
     }
 
     @Test
+    @DisplayName("deactivate card - success")
     void deactivateCardWhenCardExistsShouldDeactivate() {
         when(paymentCardRepository.findById(1L)).thenReturn(Optional.of(paymentCard));
         when(paymentCardMapper.toResponseDto(paymentCard)).thenReturn(paymentCardResponseDto);
