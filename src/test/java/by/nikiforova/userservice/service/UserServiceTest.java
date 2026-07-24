@@ -191,7 +191,7 @@ class UserServiceTest {
         UserRequestDto dtoWithNewEmail = new UserRequestDto(
                 "Katsiaryna",
                 "Nikifarava",
-                "katsia-niki@gmail.com",  // other email
+                "katsia-niki@gmail.com",
                 LocalDate.of(1993, Month.APRIL, 14)
         );
 

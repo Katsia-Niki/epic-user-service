@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CardLimitExceededException.class)
     public ResponseEntity<ErrorResponse> handleCardLimitExceeded(
             CardLimitExceededException e, HttpServletRequest request) {
-        log.error(e.getMessage());
+        log.warn(e.getMessage());
         ErrorResponse response = new ErrorResponse(
                 LocalDateTime.now(ZoneId.of(TIMEZONE)),
                 HttpStatus.CONFLICT.value(),

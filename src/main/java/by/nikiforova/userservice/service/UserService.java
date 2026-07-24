@@ -49,7 +49,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserWithCardsResponseDto getUserById(Long id) {
         User user = userRepository.findWithPaymentCardsById(id)
-                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE + id));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE.formatted(id)));
         return userMapper.toWithCardsResponseDto(user);
     }
 
@@ -72,7 +72,7 @@ public class UserService {
         log.info("Updating user with id: {}", id);
 
         User foundUser = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE + id));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE.formatted(id)));
 
         if (!foundUser.getEmail().equals(dto.email()) && userRepository.existsByEmail(dto.email())) {
             throw new UserAlreadyExistsException("User with email already exists: " + dto.email());
@@ -86,7 +86,7 @@ public class UserService {
     public void deleteUser(Long id) {
         log.info("Deleting user with id: {}", id);
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE + id));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE.formatted(id)));
         userRepository.delete(user);
     }
 
@@ -95,7 +95,7 @@ public class UserService {
     public UserResponseDto activateUser(Long id) {
         log.info("Activating user with id: {}", id);
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE + id));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE.formatted(id)));
         user.setActive(true);
         return userMapper.toResponseDto(user);
     }
@@ -105,7 +105,7 @@ public class UserService {
     public UserResponseDto deactivateUser(Long id) {
         log.info("Deactivating user with id: {}", id);
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE + id));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE.formatted(id)));
         user.setActive(false);
         return userMapper.toResponseDto(user);
     }

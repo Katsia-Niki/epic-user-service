@@ -8,7 +8,7 @@ public final class Constants {
     public static final String USERS_WITH_CARDS_CACHE = "users-with-cards";
     public static final String TIMEZONE = "Europe/Minsk";
     public static final int MAX_CARDS_PER_USER = 5;
-    public static final String CARD_NOT_FOUND_MESSAGE = "Card not found with id: ";
-    public static final String USER_NOT_FOUND_MESSAGE = "User not found with id: ";
+    public static final String CARD_NOT_FOUND_MESSAGE = "Card not found with id: %s";
+    public static final String USER_NOT_FOUND_MESSAGE = "User not found with id: %s";
 
 }

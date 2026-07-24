@@ -25,8 +25,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 
-import static by.nikiforova.userservice.constant.Constants.CARD_NOT_FOUND_MESSAGE;
-import static by.nikiforova.userservice.constant.Constants.MAX_CARDS_PER_USER;
+import static by.nikiforova.userservice.constant.Constants.*;
 
 @Slf4j
 @Service
@@ -46,7 +45,7 @@ public class PaymentCardService {
         log.info("Starting card creation for userId: {}", userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE.formatted(userId)));
         if (isMaximumCardsPerUserReached(userId)) {
             log.error("Maximum cards reached for user: {}", userId);
             throw new CardLimitExceededException("Maximum cards reached for user: " + userId);
@@ -68,7 +67,7 @@ public class PaymentCardService {
     public PaymentCardResponseDto getCardById(Long id) {
         log.info("Fetching card by id: {}", id);
         PaymentCard paymentCard = paymentCardRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(CARD_NOT_FOUND_MESSAGE + id));
+                .orElseThrow(() -> new EntityNotFoundException(CARD_NOT_FOUND_MESSAGE.formatted(id)));
         return paymentCardMapper.toResponseDto(paymentCard);
     }
 
@@ -88,7 +87,7 @@ public class PaymentCardService {
         log.info("Fetching cards by user id: {}", userId);
 
         if (!userRepository.existsById(userId)) {
-            throw new EntityNotFoundException("User not found with id: " + userId);
+            throw new EntityNotFoundException(USER_NOT_FOUND_MESSAGE.formatted(userId));
         }
 
         List<PaymentCard> cards = paymentCardRepository.findByUserId(userId);
@@ -102,7 +101,7 @@ public class PaymentCardService {
         log.info("Updating card with id: {}", id);
 
         PaymentCard cardToUpdate = paymentCardRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(CARD_NOT_FOUND_MESSAGE + id));
+                .orElseThrow(() -> new EntityNotFoundException(CARD_NOT_FOUND_MESSAGE.formatted(id)));
 
         paymentCardMapper.updateEntity(dto, cardToUpdate);
 
@@ -115,7 +114,7 @@ public class PaymentCardService {
         log.info("Activating card with id: {}", id);
 
         PaymentCard card = paymentCardRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(CARD_NOT_FOUND_MESSAGE + id));
+                .orElseThrow(() -> new EntityNotFoundException(CARD_NOT_FOUND_MESSAGE.formatted(id)));
 
         card.setActive(true);
 
@@ -128,7 +127,7 @@ public class PaymentCardService {
         log.info("Deactivating card with id: {}", id);
 
         PaymentCard card = paymentCardRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(CARD_NOT_FOUND_MESSAGE + id));
+                .orElseThrow(() -> new EntityNotFoundException(CARD_NOT_FOUND_MESSAGE.formatted(id)));
 
         card.setActive(false);
 

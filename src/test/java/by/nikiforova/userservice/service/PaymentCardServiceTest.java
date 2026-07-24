@@ -27,8 +27,7 @@ import java.time.Month;
 import java.util.List;
 import java.util.Optional;
 
-import static by.nikiforova.userservice.constant.Constants.CARD_NOT_FOUND_MESSAGE;
-import static by.nikiforova.userservice.constant.Constants.MAX_CARDS_PER_USER;
+import static by.nikiforova.userservice.constant.Constants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,6 +38,13 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentCardServiceTest {
+
+    private static final String USER_NAME = "Katsiaryna";
+    private static final String USER_SURNAME = "Nikifarava";
+    private static final String EMAIL = "katsiaryna.niki@gmail.com";
+    private static final LocalDate BIRTH_DATE = LocalDate.of(1993, Month.APRIL, 14);
+    private static final String CARD_NUMBER = "1234567891234567";
+    private static final LocalDate EXPIRATION_DATE = LocalDate.of(2030, Month.APRIL, 25);
 
     @Mock
     private PaymentCardRepository paymentCardRepository;
@@ -58,27 +64,27 @@ class PaymentCardServiceTest {
     @BeforeEach
     void setUp() {
         user = User.builder()
-                .name("Katsiaryna")
-                .surname("Nikifarava")
-                .birthDate(LocalDate.of(1993, Month.APRIL, 14))
-                .email("katsiaryna.niki@gmail.com")
+                .name(USER_NAME)
+                .surname(USER_SURNAME)
+                .birthDate(BIRTH_DATE)
+                .email(EMAIL)
                 .build();
         user.setId(1L);
 
         paymentCard = PaymentCard.builder()
                 .user(user)
-                .number("1234567891234567")
+                .number(CARD_NUMBER)
                 .holder(user.getName() + " " + user.getSurname())
-                .expirationDate(LocalDate.of(2030, Month.APRIL, 25))
+                .expirationDate(EXPIRATION_DATE)
                 .active(true)
                 .build();
         paymentCard.setId(1L);
 
         paymentCardRequestDto = new PaymentCardRequestDto(user.getName() + " " + user.getSurname(),
-                LocalDate.of(2030, Month.APRIL, 25));
+                EXPIRATION_DATE);
 
-        paymentCardResponseDto = new PaymentCardResponseDto(1L, 1L, "1234567891234567",
-                user.getName() + " " + user.getSurname(), LocalDate.of(2030, Month.APRIL, 25),
+        paymentCardResponseDto = new PaymentCardResponseDto(1L, 1L, CARD_NUMBER,
+                user.getName() + " " + user.getSurname(), EXPIRATION_DATE,
                 true, null, null);
     }
 
@@ -109,7 +115,7 @@ class PaymentCardServiceTest {
                 () -> paymentCardService.createCard(2L)
         );
 
-        assertEquals("User not found", exception.getMessage());
+        assertEquals(USER_NOT_FOUND_MESSAGE.formatted(2), exception.getMessage());
         verify(userRepository).findById(2L);
         verify(paymentCardRepository, never()).save(any());
     }
@@ -153,7 +159,7 @@ class PaymentCardServiceTest {
                 () -> paymentCardService.getCardById(2L)
         );
 
-        assertEquals(CARD_NOT_FOUND_MESSAGE + 2, exception.getMessage());
+        assertEquals(CARD_NOT_FOUND_MESSAGE.formatted(2), exception.getMessage());
 
         verify(paymentCardRepository).findById(2L);
         verify(paymentCardMapper, never()).toResponseDto(any());
@@ -169,7 +175,7 @@ class PaymentCardServiceTest {
         when(paymentCardRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(cardPage);
         when(paymentCardMapper.toDtoPage(cardPage)).thenReturn(expectedPage);
 
-        Page<PaymentCardResponseDto> result = paymentCardService.getAllCards("Katsiaryna", "Nikifarava", pageable);
+        Page<PaymentCardResponseDto> result = paymentCardService.getAllCards(USER_NAME, USER_SURNAME, pageable);
 
         assertEquals(expectedPage, result);
 
@@ -234,7 +240,7 @@ class PaymentCardServiceTest {
                 () -> paymentCardService.updateCard(2L, paymentCardRequestDto)
         );
 
-        assertEquals(CARD_NOT_FOUND_MESSAGE + 2, exception.getMessage());
+        assertEquals(CARD_NOT_FOUND_MESSAGE.formatted(2), exception.getMessage());
 
         verify(paymentCardRepository).findById(2L);
         verify(paymentCardMapper, never()).updateEntity(any(), any());

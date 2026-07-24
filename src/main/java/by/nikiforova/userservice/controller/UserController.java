@@ -26,7 +26,6 @@ public class UserController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String surname,
             Pageable pageable) {
-        log.info("Getting all users");
         return ResponseEntity.ok(userService.getAllUsers(name, surname, pageable));
     }
 
@@ -39,7 +38,6 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserWithCardsResponseDto> getUserById(
             @PathVariable Long id) {
-        log.info("Getting user with id {}", id);
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
@@ -48,26 +46,22 @@ public class UserController {
             @PathVariable Long id,
             @Valid @RequestBody UserRequestDto dto
     ) {
-        log.info("Updating user with id {}", id);
         return ResponseEntity.ok(userService.updateUser(id, dto));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        log.info("Deleting user with id {}", id);
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/activate")
     public ResponseEntity<UserResponseDto> activateUser (@PathVariable Long id) {
-        log.info("Activating user with id {}", id);
         return ResponseEntity.ok(userService.activateUser(id));
     }
 
     @PatchMapping("/{id}/deactivate")
     public ResponseEntity<UserResponseDto> deactivateUser (@PathVariable Long id) {
-        log.info("Deactivating user with id {}", id);
         return ResponseEntity.ok(userService.deactivateUser(id));
     }
 

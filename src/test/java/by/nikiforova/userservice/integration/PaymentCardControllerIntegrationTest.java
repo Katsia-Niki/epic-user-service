@@ -4,6 +4,7 @@ import by.nikiforova.userservice.dto.request.PaymentCardRequestDto;
 import by.nikiforova.userservice.dto.request.UserRequestDto;
 import by.nikiforova.userservice.dto.response.PaymentCardResponseDto;
 import by.nikiforova.userservice.dto.response.UserResponseDto;
+import by.nikiforova.userservice.dto.response.UserWithCardsResponseDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
@@ -11,7 +12,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 
+import static by.nikiforova.userservice.constant.Constants.USER_NOT_FOUND_MESSAGE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -27,55 +31,75 @@ class PaymentCardControllerIntegrationTest extends AbstractIntegrationTest {
 
         MvcResult createCardResult = mockMvc.perform(post("/api/cards/users/{userId}", user.id()))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.userId").value(user.id()))
-                .andExpect(jsonPath("$.number").isString())
-                .andExpect(jsonPath("$.active").value(true))
                 .andReturn();
 
         PaymentCardResponseDto createdCard = objectMapper.readValue(
                 createCardResult.getResponse().getContentAsString(),
                 PaymentCardResponseDto.class);
 
+        assertThat(createdCard.userId()).isEqualTo(user.id());
+        assertThat(createdCard.active()).isTrue();
         assertThat(createdCard.number()).hasSize(16);
         assertThat(paymentCardRepository.count()).isEqualTo(1);
 
-        mockMvc.perform(get("/api/users/{id}", user.id()))
+        MvcResult getUserResult = mockMvc.perform(get("/api/users/{id}", user.id()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.cards").isArray())
-                .andExpect(jsonPath("$.cards.length()").value(1))
-                .andExpect(jsonPath("$.cards[0].id").value(createdCard.id()));
+                .andReturn();
+
+        UserWithCardsResponseDto userWithCards = objectMapper.readValue(
+                getUserResult.getResponse().getContentAsString(),
+                UserWithCardsResponseDto.class);
+
+        assertThat(userWithCards.cards()).hasSize(1);
+        assertThat(userWithCards.cards().getFirst().id()).isEqualTo(createdCard.id());
 
         PaymentCardRequestDto updateRequest = new PaymentCardRequestDto(
                 "Katsia Niki",
                 LocalDate.now(ZoneId.of("Europe/Minsk")).plusYears(3)
         );
 
-        mockMvc.perform(patch("/api/cards/{id}", createdCard.id())
+        MvcResult updateCardResult = mockMvc.perform(patch("/api/cards/{id}", createdCard.id())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.holder").value("Katsia Niki"));
+                .andReturn();
 
+        PaymentCardResponseDto updatedCard = objectMapper.readValue(
+                updateCardResult.getResponse().getContentAsString(),
+                PaymentCardResponseDto.class);
+
+        assertThat(updatedCard.holder()).isEqualTo("Katsia Niki");
         assertThat(paymentCardRepository.findById(createdCard.id()).orElseThrow().getHolder())
                 .isEqualTo("Katsia Niki");
 
-        mockMvc.perform(patch("/api/cards/{id}/deactivate", createdCard.id()))
+        MvcResult deactivateCardResult = mockMvc.perform(patch("/api/cards/{id}/deactivate", createdCard.id()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.active").value(false));
+                .andReturn();
 
+        PaymentCardResponseDto deactivatedCard = objectMapper.readValue(
+                deactivateCardResult.getResponse().getContentAsString(),
+                PaymentCardResponseDto.class);
+
+        assertThat(deactivatedCard.active()).isFalse();
         assertThat(paymentCardRepository.findById(createdCard.id()).orElseThrow().getActive()).isFalse();
 
-        mockMvc.perform(get("/api/cards/users/{userId}", user.id()))
+        MvcResult getCardsResult = mockMvc.perform(get("/api/cards/users/{userId}", user.id()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].active").value(false));
+                .andReturn();
+
+        List<PaymentCardResponseDto> userCards = objectMapper.readValue(
+                getCardsResult.getResponse().getContentAsString(),
+                objectMapper.getTypeFactory().constructCollectionType(List.class, PaymentCardResponseDto.class));
+
+        assertThat(userCards).hasSize(1);
+        assertThat(userCards.getFirst().active()).isFalse();
     }
 
     @Test
     void shouldReturnNotFoundWhenCreatingCardForMissingUser() throws Exception {
         mockMvc.perform(post("/api/cards/users/{userId}", 745))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("User not found"));
+                .andExpect(jsonPath("$.message").value(USER_NOT_FOUND_MESSAGE.formatted(745)));
 
         assertThat(paymentCardRepository.count()).isZero();
     }
@@ -127,11 +151,24 @@ class PaymentCardControllerIntegrationTest extends AbstractIntegrationTest {
                 createCardResult.getResponse().getContentAsString(),
                 PaymentCardResponseDto.class);
 
-        mockMvc.perform(get("/api/cards/{id}", createdCard.id()))
+        MvcResult result = mockMvc.perform(get("/api/cards/{id}", createdCard.id()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(createdCard.id()))
-                .andExpect(jsonPath("$.userId").value(user.id()))
-                .andExpect(jsonPath("$.active").value(true));
+                .andReturn();
+
+        PaymentCardResponseDto actual = objectMapper.readValue(
+                result.getResponse().getContentAsString(),
+                PaymentCardResponseDto.class);
+
+        assertThat(actual.id()).isEqualTo(createdCard.id());
+        assertThat(actual.userId()).isEqualTo(user.id());
+        assertThat(actual.number()).isEqualTo(createdCard.number());
+        assertThat(actual.holder()).isEqualTo(createdCard.holder());
+        assertThat(actual.expirationDate()).isEqualTo(createdCard.expirationDate());
+        assertThat(actual.active()).isTrue();
+        assertThat(actual.createdAt().truncatedTo(ChronoUnit.MILLIS))
+                .isEqualTo(createdCard.createdAt().truncatedTo(ChronoUnit.MILLIS));
+        assertThat(actual.updatedAt().truncatedTo(ChronoUnit.MILLIS))
+                .isEqualTo(createdCard.updatedAt().truncatedTo(ChronoUnit.MILLIS));
     }
 
     @Test
