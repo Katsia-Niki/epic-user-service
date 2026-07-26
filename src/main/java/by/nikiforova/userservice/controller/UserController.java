@@ -6,7 +6,6 @@ import by.nikiforova.userservice.dto.response.UserWithCardsResponseDto;
 import by.nikiforova.userservice.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
-@Slf4j
 @RequiredArgsConstructor
 public class UserController {
 

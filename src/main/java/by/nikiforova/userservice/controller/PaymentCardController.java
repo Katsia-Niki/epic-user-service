@@ -2,12 +2,9 @@ package by.nikiforova.userservice.controller;
 
 import by.nikiforova.userservice.dto.request.PaymentCardRequestDto;
 import by.nikiforova.userservice.dto.response.PaymentCardResponseDto;
-import by.nikiforova.userservice.dto.response.UserResponseDto;
-import by.nikiforova.userservice.entity.PaymentCard;
 import by.nikiforova.userservice.service.PaymentCardService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -18,7 +15,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/cards")
-@Slf4j
 @RequiredArgsConstructor
 public class PaymentCardController {
 
@@ -29,13 +25,11 @@ public class PaymentCardController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String surname,
             Pageable pageable) {
-        log.info("Getting all cards");
         return ResponseEntity.ok(paymentCardService.getAllCards(name, surname, pageable));
     }
 
     @PostMapping("/users/{userId}")
     public ResponseEntity<PaymentCardResponseDto> createCard(@PathVariable Long userId) {
-        log.info("Creating card for user {}", userId);
 
         PaymentCardResponseDto dto = paymentCardService.createCard(userId);
 
@@ -44,7 +38,6 @@ public class PaymentCardController {
 
     @GetMapping("/users/{userId}")
     public ResponseEntity<List<PaymentCardResponseDto>> getCardsByUserId(@PathVariable Long userId) {
-        log.info("Getting cards for user {}", userId);
 
         List<PaymentCardResponseDto> dtoList = paymentCardService.getAllCardsByUserId(userId);
 
@@ -58,7 +51,6 @@ public class PaymentCardController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PaymentCardResponseDto> getCardById(@PathVariable Long id) {
-        log.info("Getting card with id {}", id);
         return ResponseEntity.ok(paymentCardService.getCardById(id));
     }
 
@@ -66,19 +58,16 @@ public class PaymentCardController {
     public ResponseEntity<PaymentCardResponseDto> updateCardById(
             @PathVariable Long id,
             @Valid @RequestBody PaymentCardRequestDto dto) {
-        log.info("Updating card with id {}", id);
         return ResponseEntity.ok(paymentCardService.updateCard(id, dto));
     }
 
     @PatchMapping("/{id}/activate")
     public ResponseEntity<PaymentCardResponseDto> activatePaymentCard(@PathVariable Long id) {
-        log.info("Activating card with id {}", id);
         return ResponseEntity.ok(paymentCardService.activateCard(id));
     }
 
     @PatchMapping("/{id}/deactivate")
     public ResponseEntity<PaymentCardResponseDto> deactivatePaymentCard(@PathVariable Long id) {
-        log.info("Deactivating card with id {}", id);
         return ResponseEntity.ok(paymentCardService.deactivateCard(id));
     }
 

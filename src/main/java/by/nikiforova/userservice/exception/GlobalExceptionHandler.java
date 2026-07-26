@@ -53,7 +53,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleUserAlreadyExistsException(
             UserAlreadyExistsException e, HttpServletRequest request) {
-        log.error(e.getMessage());
+        log.warn(e.getMessage());
         ErrorResponse response = new ErrorResponse(
                 LocalDateTime.now(ZoneId.of(TIMEZONE)),
                 HttpStatus.CONFLICT.value(),
