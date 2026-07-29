@@ -71,6 +71,9 @@ public class PaymentCardService {
         log.info("Fetching card by id: {}", id);
         PaymentCard paymentCard = paymentCardRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(CARD_NOT_FOUND_MESSAGE.formatted(id)));
+
+        SecurityUtils.checkAccess(paymentCard.getUser().getId());
+
         return paymentCardMapper.toResponseDto(paymentCard);
     }
 

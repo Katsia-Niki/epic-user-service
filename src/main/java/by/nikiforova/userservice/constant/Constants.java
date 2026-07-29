@@ -10,6 +10,6 @@ public final class Constants {
     public static final int MAX_CARDS_PER_USER = 5;
     public static final String CARD_NOT_FOUND_MESSAGE = "Card not found with id: %s";
     public static final String USER_NOT_FOUND_MESSAGE = "User not found with id: %s";
-    public static final String ROLE_ADMIN = "ROLE_ADMIN";
+    public static final String ROLE_ADMIN = "ADMIN";
 
 }
