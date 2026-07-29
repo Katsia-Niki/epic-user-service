@@ -1,4 +1,4 @@
-package by.nikiforova.userservice.filter;
+package by.nikiforova.userservice.security;
 
 import by.nikiforova.userservice.entity.Role;
 import by.nikiforova.userservice.service.JwtService;
@@ -7,7 +7,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private static final String ROLE_PREFIX = "ROLE_";
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
     private final JwtService jwtService;
@@ -53,7 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String login = claims.getSubject();
             Role role = Role.valueOf(claims.get("role", String.class));
 
-            List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role.name()));
+            List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(ROLE_PREFIX + role.name()));
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(login, null, authorities);
 
             authentication.setDetails(userId);

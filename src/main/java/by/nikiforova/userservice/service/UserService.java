@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import by.nikiforova.userservice.security.SecurityUtils;
 
 import static by.nikiforova.userservice.constant.Constants.USER_NOT_FOUND_MESSAGE;
 
@@ -48,6 +49,8 @@ public class UserService {
     @Cacheable(value = Constants.USERS_WITH_CARDS_CACHE, key = "#id")
     @Transactional(readOnly = true)
     public UserWithCardsResponseDto getUserById(Long id) {
+        SecurityUtils.checkAccess(id);
+
         User user = userRepository.findWithPaymentCardsById(id)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE.formatted(id)));
         return userMapper.toWithCardsResponseDto(user);
@@ -68,6 +71,7 @@ public class UserService {
     @Transactional
     @CacheEvict(value = Constants.USERS_WITH_CARDS_CACHE, key = "#id")
     public UserResponseDto updateUser(Long id, UserRequestDto dto) {
+        SecurityUtils.checkAccess(id);
 
         log.info("Updating user with id: {}", id);
 
