@@ -4,6 +4,7 @@ import by.nikiforova.userservice.dto.response.ErrorResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
@@ -21,9 +22,9 @@ import static by.nikiforova.userservice.constant.Constants.TIMEZONE;
 public class JsonAccessDeniedHandler implements AccessDeniedHandler {
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Override
-    public void handle(HttpServletRequest request,
-                       HttpServletResponse response,
-                       AccessDeniedException accessDeniedException) throws IOException, ServletException {
+    public void handle(@NonNull HttpServletRequest request,
+                       @NonNull HttpServletResponse response,
+                       @NonNull AccessDeniedException accessDeniedException) throws IOException {
 
         response.setStatus(HttpStatus.FORBIDDEN.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
