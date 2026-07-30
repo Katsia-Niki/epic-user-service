@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: epic-postgres
+    container_name: epic-user-service-postgres
     environment:
       POSTGRES_DB: epic_user_service
       POSTGRES_USER: ${DB_USERNAME}
@@ -37,6 +37,7 @@ services:
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
+      AUTH_SERVICE_URL: http://epic-auth-service:8080
     depends_on:
       postgres:
         condition: service_healthy
@@ -45,3 +46,8 @@ services:
 
 volumes:
   postgres_data:
+
+networks:
+  default:
+    name: epic-network
+    external: true

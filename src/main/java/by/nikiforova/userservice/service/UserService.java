@@ -1,5 +1,6 @@
 package by.nikiforova.userservice.service;
 
+import by.nikiforova.userservice.client.AuthServiceClient;
 import by.nikiforova.userservice.constant.Constants;
 import by.nikiforova.userservice.dto.request.UserRequestDto;
 import by.nikiforova.userservice.dto.response.UserResponseDto;
@@ -30,6 +31,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final AuthServiceClient  authServiceClient;
 
     @Transactional
     public UserResponseDto createUser(UserRequestDto dto) {
@@ -43,6 +45,9 @@ public class UserService {
         }
         user.setActive(true);
         User savedUser = userRepository.save(user);
+
+        authServiceClient.createCredentials(savedUser.getId(), dto.login(), dto.password(), dto.role());
+
         return userMapper.toResponseDto(savedUser);
     }
 
