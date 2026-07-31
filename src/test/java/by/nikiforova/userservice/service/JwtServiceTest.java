@@ -16,6 +16,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class JwtServiceTest {
 
     private static final String SECRET = "test-secret-key-test-secret-key-test-secret-key";
+    private static final Long USER_ID = 1L;
+    private static final String ROLE = "USER";
+    private static final String LOGIN = "liza";
 
     private JwtService jwtService;
 
@@ -27,7 +30,7 @@ class JwtServiceTest {
     @Test
     @DisplayName("validateToken - success")
     void validateTokenWhenTokenValidShouldReturnTrue() {
-        String token = createToken(1L, "USER", "liza");
+        String token = createToken();
 
         assertTrue(jwtService.validateToken(token));
     }
@@ -42,20 +45,20 @@ class JwtServiceTest {
     @Test
     @DisplayName("parseToken - success")
     void parseTokenWhenTokenValidShouldReturnClaims() {
-        String token = createToken(1L, "USER", "liza");
+        String token = createToken();
 
         Claims claims = jwtService.parseToken(token);
 
-        assertEquals(1L, claims.get("userId", Long.class));
-        assertEquals("USER", claims.get("role", String.class));
-        assertEquals("liza", claims.getSubject());
+        assertEquals(USER_ID, claims.get("userId", Long.class));
+        assertEquals(ROLE, claims.get("role", String.class));
+        assertEquals(LOGIN, claims.getSubject());
     }
 
-    private String createToken(Long userId, String role, String login) {
+    private String createToken() {
         return Jwts.builder()
-                .subject(login)
-                .claim("userId", userId)
-                .claim("role", role)
+                .subject(LOGIN)
+                .claim("userId", USER_ID)
+                .claim("role", ROLE)
                 .signWith(Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8)))
                 .compact();
     }
