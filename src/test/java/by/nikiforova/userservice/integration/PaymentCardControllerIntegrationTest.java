@@ -5,6 +5,7 @@ import by.nikiforova.userservice.dto.request.UserRequestDto;
 import by.nikiforova.userservice.dto.response.PaymentCardResponseDto;
 import by.nikiforova.userservice.dto.response.UserResponseDto;
 import by.nikiforova.userservice.dto.response.UserWithCardsResponseDto;
+import by.nikiforova.userservice.entity.Role;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
@@ -183,7 +184,10 @@ class PaymentCardControllerIntegrationTest extends AbstractIntegrationTest {
                 "Katsiaryna",
                 "Nikifarava",
                 "katsiaryna.niki@gmail.com",
-                LocalDate.of(1993, Month.APRIL, 14)
+                LocalDate.of(1993, Month.APRIL, 14),
+                "katsiaryna",
+                "password123",
+                Role.USER
         );
 
         MvcResult result = mockMvc.perform(post("/api/users")
