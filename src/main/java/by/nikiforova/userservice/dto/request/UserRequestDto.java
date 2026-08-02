@@ -1,6 +1,5 @@
 package by.nikiforova.userservice.dto.request;
 
-import by.nikiforova.userservice.entity.Role;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
