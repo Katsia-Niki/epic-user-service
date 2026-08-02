@@ -1,4 +1,4 @@
-package by.nikiforova.userservice.security;
+package by.nikiforova.userservice.util;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;

@@ -1,10 +1,8 @@
 package by.nikiforova.userservice.service;
 
-import by.nikiforova.userservice.client.AuthServiceClient;
 import by.nikiforova.userservice.dto.request.UserRequestDto;
 import by.nikiforova.userservice.dto.response.UserResponseDto;
 import by.nikiforova.userservice.dto.response.UserWithCardsResponseDto;
-import by.nikiforova.userservice.entity.Role;
 import by.nikiforova.userservice.entity.User;
 import by.nikiforova.userservice.exception.EntityNotFoundException;
 import by.nikiforova.userservice.exception.UserAlreadyExistsException;
@@ -42,8 +40,6 @@ class UserServiceTest {
     private UserRepository userRepository;
     @Mock
     private UserMapper userMapper;
-    @Mock
-    private AuthServiceClient authServiceClient;
 
     @InjectMocks
     private UserService userService;
@@ -72,8 +68,7 @@ class UserServiceTest {
                 .build();
         user.setId(1L);
         userRequestDto = new UserRequestDto("Katsiaryna", "Nikifarava",
-                "katsiaryna.niki@gmail.com", LocalDate.of(1993, Month.APRIL, 14),
-                "katsiaryna", "password123", Role.USER);
+                "katsiaryna.niki@gmail.com", LocalDate.of(1993, Month.APRIL, 14));
         userResponseDto = new UserResponseDto(1L, "Katsiaryna", "Nikifarava",
                 "katsiaryna.niki@gmail.com", LocalDate.of(1993, Month.APRIL, 14),
                 true, null, null);
@@ -98,7 +93,6 @@ class UserServiceTest {
         assertTrue(user.getActive());
         verify(userRepository).existsByEmail(user.getEmail());
         verify(userRepository).save(user);
-        verify(authServiceClient).createCredentials(1L, "katsiaryna", "password123", Role.USER);
         verify(userMapper).toResponseDto(user);
     }
 
@@ -217,10 +211,7 @@ class UserServiceTest {
                 "Katsiaryna",
                 "Nikifarava",
                 "katsia-niki@gmail.com",
-                LocalDate.of(1993, Month.APRIL, 14),
-                "katsiaryna",
-                "password123",
-                Role.USER
+                LocalDate.of(1993, Month.APRIL, 14)
         );
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));

@@ -2,7 +2,6 @@ package by.nikiforova.userservice.integration;
 
 import by.nikiforova.userservice.dto.request.UserRequestDto;
 import by.nikiforova.userservice.dto.response.UserResponseDto;
-import by.nikiforova.userservice.entity.Role;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
@@ -24,10 +23,7 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
             "Katsiaryna",
             "Nikifarava",
             "katsiaryna.niki@gmail.com",
-            LocalDate.of(1993, Month.APRIL, 14),
-            "katsiaryna",
-            "password123",
-            Role.USER
+            LocalDate.of(1993, Month.APRIL, 14)
     );
 
     @Test
@@ -87,8 +83,7 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void shouldReturnBadRequestWhenUserDataInvalid() throws Exception {
-        UserRequestDto invalid = new UserRequestDto("", "Niki", "not-email", LocalDate.now(),
-                "login", "password123", Role.USER);
+        UserRequestDto invalid = new UserRequestDto("", "Niki", "not-email", LocalDate.now());
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalid)))
@@ -105,10 +100,7 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
                 "Katsia",
                 "Niki",
                 USER_REQUEST.email(),
-                USER_REQUEST.birthDate(),
-                USER_REQUEST.login(),
-                USER_REQUEST.password(),
-                USER_REQUEST.role()
+                USER_REQUEST.birthDate()
         );
 
         mockMvc.perform(patch("/api/users/{id}", createdUser.id())

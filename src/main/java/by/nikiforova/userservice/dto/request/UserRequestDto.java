@@ -8,8 +8,5 @@ import java.time.LocalDate;
 public record UserRequestDto (@NotBlank String name,
                               @NotBlank String surname,
                               @NotBlank @Email String email,
-                              @NotNull @Past LocalDate birthDate,
-                              @NotBlank String login,
-                              @NotBlank @Size(min = 8) String password,
-                              @NotNull Role role) {
+                              @NotNull @Past LocalDate birthDate) {
 }

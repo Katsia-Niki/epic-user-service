@@ -10,7 +10,7 @@ import by.nikiforova.userservice.exception.EntityNotFoundException;
 import by.nikiforova.userservice.mapper.PaymentCardMapper;
 import by.nikiforova.userservice.repository.PaymentCardRepository;
 import by.nikiforova.userservice.repository.UserRepository;
-import by.nikiforova.userservice.security.SecurityUtils;
+import by.nikiforova.userservice.util.SecurityUtils;
 import by.nikiforova.userservice.specification.PaymentCardSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

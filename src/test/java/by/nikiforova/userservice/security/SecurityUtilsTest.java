@@ -1,5 +1,6 @@
 package by.nikiforova.userservice.security;
 
+import by.nikiforova.userservice.util.SecurityUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
