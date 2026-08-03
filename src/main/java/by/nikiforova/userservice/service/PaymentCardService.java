@@ -10,6 +10,7 @@ import by.nikiforova.userservice.exception.EntityNotFoundException;
 import by.nikiforova.userservice.mapper.PaymentCardMapper;
 import by.nikiforova.userservice.repository.PaymentCardRepository;
 import by.nikiforova.userservice.repository.UserRepository;
+import by.nikiforova.userservice.util.SecurityUtils;
 import by.nikiforova.userservice.specification.PaymentCardSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,8 @@ public class PaymentCardService {
     @CacheEvict(value = Constants.USERS_WITH_CARDS_CACHE, key = "#userId")
     public PaymentCardResponseDto createCard(Long userId) {
 
+        SecurityUtils.checkAccess(userId);
+
         log.info("Starting card creation for userId: {}", userId);
 
         User user = userRepository.findById(userId)
@@ -68,6 +71,9 @@ public class PaymentCardService {
         log.info("Fetching card by id: {}", id);
         PaymentCard paymentCard = paymentCardRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(CARD_NOT_FOUND_MESSAGE.formatted(id)));
+
+        SecurityUtils.checkAccess(paymentCard.getUser().getId());
+
         return paymentCardMapper.toResponseDto(paymentCard);
     }
 
@@ -84,6 +90,9 @@ public class PaymentCardService {
 
     @Transactional(readOnly = true)
     public List<PaymentCardResponseDto> getAllCardsByUserId(Long userId) {
+
+        SecurityUtils.checkAccess(userId);
+
         log.info("Fetching cards by user id: {}", userId);
 
         if (!userRepository.existsById(userId)) {
@@ -103,6 +112,8 @@ public class PaymentCardService {
         PaymentCard cardToUpdate = paymentCardRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(CARD_NOT_FOUND_MESSAGE.formatted(id)));
 
+        SecurityUtils.checkAccess(cardToUpdate.getUser().getId());
+
         paymentCardMapper.updateEntity(dto, cardToUpdate);
 
         return paymentCardMapper.toResponseDto(cardToUpdate);
@@ -116,6 +127,8 @@ public class PaymentCardService {
         PaymentCard card = paymentCardRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(CARD_NOT_FOUND_MESSAGE.formatted(id)));
 
+        SecurityUtils.checkAccess(card.getUser().getId());
+
         card.setActive(true);
 
         return paymentCardMapper.toResponseDto(card);
@@ -128,6 +141,8 @@ public class PaymentCardService {
 
         PaymentCard card = paymentCardRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(CARD_NOT_FOUND_MESSAGE.formatted(id)));
+
+        SecurityUtils.checkAccess(card.getUser().getId());
 
         card.setActive(false);
 

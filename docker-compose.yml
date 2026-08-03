@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: epic-postgres
+    container_name: epic-user-service-postgres
     environment:
       POSTGRES_DB: epic_user_service
       POSTGRES_USER: ${DB_USERNAME}
@@ -31,11 +31,12 @@ services:
     build: .
     container_name: epic-user-service
     ports:
-      - "8080:8080"
+      - "8081:8080"
     environment:
       SPRING_PROFILES_ACTIVE: docker
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
     depends_on:
       postgres:
         condition: service_healthy
@@ -44,3 +45,8 @@ services:
 
 volumes:
   postgres_data:
+
+networks:
+  default:
+    name: epic-network
+    external: true

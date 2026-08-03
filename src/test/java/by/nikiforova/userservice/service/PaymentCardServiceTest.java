@@ -9,6 +9,7 @@ import by.nikiforova.userservice.exception.EntityNotFoundException;
 import by.nikiforova.userservice.mapper.PaymentCardMapper;
 import by.nikiforova.userservice.repository.PaymentCardRepository;
 import by.nikiforova.userservice.repository.UserRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -63,6 +67,16 @@ class PaymentCardServiceTest {
 
     @BeforeEach
     void setUp() {
+
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(
+                        "admin",
+                        null,
+                        List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
+                );
+        authentication.setDetails(1L);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         user = User.builder()
                 .name(USER_NAME)
                 .surname(USER_SURNAME)
@@ -86,6 +100,11 @@ class PaymentCardServiceTest {
         paymentCardResponseDto = new PaymentCardResponseDto(1L, 1L, CARD_NUMBER,
                 user.getName() + " " + user.getSurname(), EXPIRATION_DATE,
                 true, null, null);
+    }
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
     }
 
     @Test
