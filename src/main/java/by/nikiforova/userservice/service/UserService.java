@@ -11,6 +11,7 @@ import by.nikiforova.userservice.mapper.UserMapper;
 import by.nikiforova.userservice.repository.UserRepository;
 import by.nikiforova.userservice.specification.UserSpecification;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import lombok.extern.slf4j.Slf4j;
@@ -115,5 +116,13 @@ public class UserService {
         return userMapper.toResponseDto(user);
     }
 
+    @Transactional(readOnly = true)
+    public UserResponseDto getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE.formatted(email)));
 
+        SecurityUtils.checkAccess(user.getId());
+
+        return userMapper.toResponseDto(user);
+    }
 }
