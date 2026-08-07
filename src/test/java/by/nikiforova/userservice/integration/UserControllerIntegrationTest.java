@@ -93,6 +93,33 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void shouldGetUserByEmail() throws Exception {
+        UserResponseDto created = createUser();
+
+        mockMvc.perform(get("/api/users/email/{email}", created.email()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(created.id()))
+                .andExpect(jsonPath("$.email").value(created.email()));
+    }
+
+    @Test
+    void shouldGetUsersByIds() throws Exception {
+        UserResponseDto created = createUser();
+
+        mockMvc.perform(get("/api/users/by-ids").param("ids", created.id().toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].id").value(created.id()))
+                .andExpect(jsonPath("$[0].email").value(created.email()));
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenGetUserByEmailDoesNotExist() throws Exception {
+        mockMvc.perform(get("/api/users/email/{email}", "nobody@mail.com"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void shouldUpdateUserInDatabase() throws Exception {
         UserResponseDto createdUser = createUser();
 
