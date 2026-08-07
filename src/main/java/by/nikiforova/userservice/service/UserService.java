@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import by.nikiforova.userservice.util.SecurityUtils;
 
+import java.util.List;
+
 import static by.nikiforova.userservice.constant.Constants.USER_NOT_FOUND_MESSAGE;
 
 @Slf4j
@@ -68,6 +70,16 @@ public class UserService {
         Page<User> userPage = userRepository.findAll(spec, pageable);
 
         return userMapper.toDtoPage(userPage);
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserResponseDto> getUsersByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return userRepository.findAllById(ids).stream()
+                .map(userMapper::toResponseDto)
+                .toList();
     }
 
     @Transactional

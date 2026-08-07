@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -25,6 +27,11 @@ public class UserController {
             @RequestParam(required = false) String surname,
             Pageable pageable) {
         return ResponseEntity.ok(userService.getAllUsers(name, surname, pageable));
+    }
+
+    @GetMapping("/by-ids")
+    public ResponseEntity<List<UserResponseDto>> getUsersByIds(@RequestParam List<Long> ids) {
+        return ResponseEntity.ok(userService.getUsersByIds(ids));
     }
 
     @PostMapping
