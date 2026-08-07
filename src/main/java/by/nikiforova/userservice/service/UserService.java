@@ -11,7 +11,6 @@ import by.nikiforova.userservice.mapper.UserMapper;
 import by.nikiforova.userservice.repository.UserRepository;
 import by.nikiforova.userservice.specification.UserSpecification;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import lombok.extern.slf4j.Slf4j;
