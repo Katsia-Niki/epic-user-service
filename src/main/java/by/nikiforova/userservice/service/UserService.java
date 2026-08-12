@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import by.nikiforova.userservice.util.SecurityUtils;
 
+import java.util.List;
+
 import static by.nikiforova.userservice.constant.Constants.USER_NOT_FOUND_MESSAGE;
 
 @Slf4j
@@ -69,6 +71,16 @@ public class UserService {
         return userMapper.toDtoPage(userPage);
     }
 
+    @Transactional(readOnly = true)
+    public List<UserResponseDto> getUsersByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return userRepository.findAllById(ids).stream()
+                .map(userMapper::toResponseDto)
+                .toList();
+    }
+
     @Transactional
     @CacheEvict(value = Constants.USERS_WITH_CARDS_CACHE, key = "#id")
     public UserResponseDto updateUser(Long id, UserRequestDto dto) {
@@ -115,5 +127,13 @@ public class UserService {
         return userMapper.toResponseDto(user);
     }
 
+    @Transactional(readOnly = true)
+    public UserResponseDto getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE.formatted(email)));
 
+        SecurityUtils.checkAccess(user.getId());
+
+        return userMapper.toResponseDto(user);
+    }
 }

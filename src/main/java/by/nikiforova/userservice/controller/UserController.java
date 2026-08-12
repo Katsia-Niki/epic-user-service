@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -27,6 +29,11 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers(name, surname, pageable));
     }
 
+    @GetMapping("/by-ids")
+    public ResponseEntity<List<UserResponseDto>> getUsersByIds(@RequestParam List<Long> ids) {
+        return ResponseEntity.ok(userService.getUsersByIds(ids));
+    }
+
     @PostMapping
     public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto dto) {
         UserResponseDto createdUser = userService.createUser(dto);
@@ -37,6 +44,12 @@ public class UserController {
     public ResponseEntity<UserWithCardsResponseDto> getUserById(
             @PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<UserResponseDto> getUserByEmail(
+            @PathVariable String email) {
+        return ResponseEntity.ok(userService.getUserByEmail(email));
     }
 
     @PatchMapping("/{id}")

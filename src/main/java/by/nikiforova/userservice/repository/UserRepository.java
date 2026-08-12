@@ -12,6 +12,8 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     boolean existsByEmail(String email);
 
+    Optional<User> findByEmail(String email);
+
     @EntityGraph(attributePaths = "paymentCards")
     Optional<User> findWithPaymentCardsById(Long id);
 }

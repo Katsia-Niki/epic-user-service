@@ -169,6 +169,48 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("get users by ids - success")
+    void getUsersByIdsWhenUsersExistShouldReturnDtos() {
+        when(userRepository.findAllById(List.of(1L))).thenReturn(List.of(user));
+        when(userMapper.toResponseDto(user)).thenReturn(userResponseDto);
+
+        List<UserResponseDto> result = userService.getUsersByIds(List.of(1L));
+
+        assertEquals(List.of(userResponseDto), result);
+
+        verify(userRepository).findAllById(List.of(1L));
+    }
+    @Test
+    @DisplayName("get users by ids - empty when null or empty")
+    void getUsersByIdsWhenIdsNullOrEmptyShouldReturnEmptyList() {
+        assertEquals(List.of(), userService.getUsersByIds(null));
+        assertEquals(List.of(), userService.getUsersByIds(List.of()));
+
+        verify(userRepository, never()).findAllById(any());
+    }
+
+    @Test
+    @DisplayName("get user by email - success")
+    void getUserByEmailWhenUserExistsShouldReturnDto() {
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(userMapper.toResponseDto(user)).thenReturn(userResponseDto);
+
+        UserResponseDto result = userService.getUserByEmail(user.getEmail());
+
+        assertEquals(userResponseDto, result);
+
+        verify(userRepository).findByEmail(user.getEmail());
+    }
+    @Test
+    @DisplayName("get user by email - EntityNotFoundException")
+    void getUserByEmailWhenUserDoesNotExistShouldThrowException() {
+        when(userRepository.findByEmail("notexisting@mail.com")).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class,
+                () -> userService.getUserByEmail("notexisting@mail.com"));
+    }
+
+    @Test
     @DisplayName("update user - success")
     void updateUserWhenUserExistsShouldUpdateAndReturnDto() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
