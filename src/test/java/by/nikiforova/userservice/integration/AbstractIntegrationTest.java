@@ -29,6 +29,8 @@ import java.util.List;
 })
 public abstract class AbstractIntegrationTest {
 
+    protected static final String TEST_INTERNAL_KEY = "test-internal-key-test-internal-key";
+
     static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer(
             DockerImageName.parse("postgres:16-alpine"));
 

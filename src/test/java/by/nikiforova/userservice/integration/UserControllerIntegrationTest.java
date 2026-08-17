@@ -9,6 +9,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.time.LocalDate;
 import java.time.Month;
 
+import static by.nikiforova.userservice.constant.Constants.INTERNAL_KEY_HEADER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -29,6 +30,7 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
     @Test
     void shouldCreateUserAndSaveInDatabase() throws Exception {
         mockMvc.perform(post("/api/users")
+                        .header(INTERNAL_KEY_HEADER, TEST_INTERNAL_KEY)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(USER_REQUEST)))
                 .andExpect(status().isCreated())
@@ -42,10 +44,12 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
     @Test
     void shouldReturnConflictWhenEmailAlreadyExists() throws Exception {
         mockMvc.perform(post("/api/users")
+                .header(INTERNAL_KEY_HEADER, TEST_INTERNAL_KEY)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(USER_REQUEST)));
 
         mockMvc.perform(post("/api/users")
+                        .header(INTERNAL_KEY_HEADER, TEST_INTERNAL_KEY)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(USER_REQUEST)))
                 .andExpect(status().isConflict())
@@ -85,6 +89,7 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
     void shouldReturnBadRequestWhenUserDataInvalid() throws Exception {
         UserRequestDto invalid = new UserRequestDto("", "Niki", "not-email", LocalDate.now());
         mockMvc.perform(post("/api/users")
+                        .header(INTERNAL_KEY_HEADER, TEST_INTERNAL_KEY)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalid)))
                 .andExpect(status().isBadRequest())
@@ -167,7 +172,8 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
     void shouldDeleteUserFromDatabase() throws Exception {
         UserResponseDto createdUser = createUser();
 
-        mockMvc.perform(delete("/api/users/{id}", createdUser.id()))
+        mockMvc.perform(delete("/api/users/{id}", createdUser.id())
+                        .header(INTERNAL_KEY_HEADER, TEST_INTERNAL_KEY))
                 .andExpect(status().isNoContent());
 
         assertThat(userRepository.existsById(createdUser.id())).isFalse();
@@ -175,6 +181,7 @@ class UserControllerIntegrationTest extends AbstractIntegrationTest {
 
     private UserResponseDto createUser() throws Exception {
         MvcResult result = mockMvc.perform(post("/api/users")
+                        .header(INTERNAL_KEY_HEADER, TEST_INTERNAL_KEY)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(USER_REQUEST)))
                 .andExpect(status().isCreated())
