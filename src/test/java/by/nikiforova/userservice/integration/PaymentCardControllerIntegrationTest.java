@@ -15,6 +15,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import static by.nikiforova.userservice.constant.Constants.INTERNAL_KEY_HEADER;
 import static by.nikiforova.userservice.constant.Constants.USER_NOT_FOUND_MESSAGE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -187,6 +188,7 @@ class PaymentCardControllerIntegrationTest extends AbstractIntegrationTest {
         );
 
         MvcResult result = mockMvc.perform(post("/api/users")
+                        .header(INTERNAL_KEY_HEADER, TEST_INTERNAL_KEY)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
