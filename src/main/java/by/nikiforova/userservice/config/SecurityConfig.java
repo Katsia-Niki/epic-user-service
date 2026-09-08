@@ -45,7 +45,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/cards").hasRole(ROLE_ADMIN)
                         .requestMatchers(HttpMethod.PATCH, "/api/users/*/activate").hasRole(ROLE_ADMIN)
                         .requestMatchers(HttpMethod.PATCH, "/api/users/*/deactivate").hasRole(ROLE_ADMIN)
-
+                        .requestMatchers("/actuator/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
